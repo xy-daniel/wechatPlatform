@@ -75,8 +75,8 @@ public class WxUtil {
      * }
      */
     public static JSON check () {
-        String url = "https://api.weixin.qq.com/cgi-bin/callback/check?access_token=" + TokenCache.tokenMap.get("token");
-        Map<String, String> data = new HashMap<>();
+        String url = "https://api.weixin.qq.com/cgi-bin/callback/check?access_token=" + fetchToken();
+        Map<String, Object> data = new HashMap<>();
         data.put("action", "all");
         data.put("check_operator", "DEFAULT");
         System.out.println("WxUtil.check 请求地址：" + url);
