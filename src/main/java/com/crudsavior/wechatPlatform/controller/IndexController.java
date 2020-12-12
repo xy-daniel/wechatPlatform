@@ -71,7 +71,8 @@ public class IndexController {
      * @param response 响应体
      */
     @PostMapping("/")
-    public void sendMsg(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void sendMsg(HttpServletRequest request, HttpServletResponse response, String openid) throws IOException {
+        log.info("收到的接收方账号（OpenID）：" + openid);
         JSONObject jsonObject = MsgHandleUtil.analysisMsg(HttpUtil.doPost(request));
         log.info("消息数据：\n" + jsonObject);
         //此消息类型用于了解接收到的消息类型
@@ -133,7 +134,7 @@ public class IndexController {
         Map<String, Object> msgData = new HashMap<>();
         msgData.put("content", returnContent);
         //此消息类型用于明确回复的消息类型
-        String returnTextXml = MsgHandleUtil.encapsulationMsg(ResponseMsgType.TEXT, jsonObject, msgData);
+        String returnTextXml = MsgHandleUtil.encapsulationMsg(ResponseMsgType.TEXT, openid, jsonObject, msgData);
         HttpUtil.sendMsg(response, returnTextXml);
     }
 

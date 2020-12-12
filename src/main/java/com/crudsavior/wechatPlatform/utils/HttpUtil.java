@@ -8,11 +8,8 @@ import cn.hutool.json.JSONUtil;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.websocket.MessageHandler;
 import java.io.IOException;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * HttpUtil
@@ -39,6 +36,12 @@ public class HttpUtil {
         return JSONUtil.parse(HttpRequest.post(url).body(String.valueOf(JSONUtil.parse(data))).execute().body());
     }
 
+    /**
+     * 从请求体的流中解析数据
+     * @param request 请求体
+     * @return 流数据
+     * @throws IOException IO异常
+     */
     public static String doPost(HttpServletRequest request) throws IOException {
         ServletInputStream stream = request.getInputStream();
         byte[] b = new byte[1024];
@@ -52,13 +55,13 @@ public class HttpUtil {
     }
 
     /**
-     * 被动发送消息
+     * 以响应体的方式回复内容
      * @param response 响应体
-     * @param xmlData xml数据
+     * @param data 回复数据
      * @throws IOException IO异常
      */
-    public static void sendMsg(HttpServletResponse response, String xmlData) throws IOException {
+    public static void sendMsg(HttpServletResponse response, String data) throws IOException {
         response.setContentType("text/html;charset=utf-8");
-        response.getWriter().println(xmlData);
+        response.getWriter().println(data);
     }
 }

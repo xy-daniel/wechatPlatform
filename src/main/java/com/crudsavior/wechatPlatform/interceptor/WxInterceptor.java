@@ -4,13 +4,11 @@ import com.crudsavior.wechatPlatform.utils.WxUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
 
 /**
  * WxInterceptor
@@ -30,7 +28,7 @@ public class WxInterceptor implements HandlerInterceptor {
         String signature = request.getParameter("signature");
         String timestamp = request.getParameter("timestamp");
         String nonce = request.getParameter("nonce");
-        log.info("拦截到的参数：1、" + signature + " 2、" + timestamp + " 3、" + nonce + "4、" + token);
+        log.info("拦截到的参数：1、" + signature + " 2、" + timestamp + " 3、" + nonce + " 4、" + token);
         if (!WxUtil.checkSign(signature, timestamp, nonce, token)) {
             log.error("校验微信服务器失败,被拦截.");
             return false;
