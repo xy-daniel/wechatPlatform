@@ -2,9 +2,6 @@ package com.crudsavior.wechatPlatform.controller;
 
 import cn.hutool.json.JSON;
 import cn.hutool.json.JSONObject;
-import com.crudsavior.wechatPlatform.status.EventMsgType;
-import com.crudsavior.wechatPlatform.status.RequestMsgType;
-import com.crudsavior.wechatPlatform.status.ResponseMsgType;
 import com.crudsavior.wechatPlatform.utils.HttpUtil;
 import com.crudsavior.wechatPlatform.utils.MsgHandleUtil;
 import com.crudsavior.wechatPlatform.utils.WxUtil;
@@ -16,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -74,67 +70,18 @@ public class IndexController {
     public void sendMsg(HttpServletRequest request, HttpServletResponse response, String openid) throws IOException {
         log.info("收到的接收方账号（OpenID）：" + openid);
         JSONObject jsonObject = MsgHandleUtil.analysisMsg(HttpUtil.doPost(request));
+        log.info("使用openid替换fromUserName：" + jsonObject.getByPath("xml.FromUserName"));
+        jsonObject.putByPath("xml.FromUserName", openid);
         log.info("消息数据：\n" + jsonObject);
         //此消息类型用于了解接收到的消息类型
-        String msgType = jsonObject.getByPath("xml.MsgType").toString();
-        if (msgType.equals(RequestMsgType.EVENT)) {
-            log.info("接收事件推送");
-            String event = jsonObject.getByPath("xml.Event").toString();
-            if (event.equals(EventMsgType.SUBSCRIBE)){
-                Object eventKey = jsonObject.getByPath("xml.EventKey");
-                if (eventKey == null) {
-                    log.info("订阅事件推送.");
-                } else {
-                    log.info("用户未关注时，进行关注后的事件推送.");
-                }
-                return;
-            }
-            if (event.equals(EventMsgType.UNSUBSCRIBE)){
-                log.info("取消订阅事件推送.");
-                return;
-            }
-            if (event.equals(EventMsgType.SCAN)){
-                log.info("用户已关注时的事件推送.");
-                return;
-            }
-            if (event.equals(EventMsgType.LOCATION)){
-                log.info("上报地理位置事件推送.");
-                return;
-            }
-            if (event.equals(EventMsgType.CLICK)){
-                log.info("自定义菜单事件推送.");
-                return;
-            }
-            if (event.equals(EventMsgType.VIEW)){
-                log.info("点击菜单跳转链接时的事件推送.");
-                return;
-            }
+        Map<String, Object> msgData = MsgHandleUtil.getMsgData(jsonObject);
+        if (msgData == null) {
+            log.info("封装返回值基础数据失败.");
+            return;
         }
-        log.info("接收普通消息");
-        String returnContent;
-        //需要返回的是文本消息做如下处理
-        if (msgType.equals(ResponseMsgType.TEXT)) {
-            String content = jsonObject.getByPath("xml.Content").toString();
-            if (content.equals("1")) {
-                returnContent = "大吉大利,今晚吃鸡.(全匹配)";
-            } else if (content.equals("2")) {
-                returnContent = "落地成盒.(全匹配)";
-            } else if (content.contains("1")) {
-                returnContent = "大吉大利,今晚吃鸡(半匹配).";
-            } else if (content.contains("2")) {
-                returnContent = "落地成盒.(半匹配)";
-            } else {
-                returnContent = "啥也没有.";
-            }
-        } else {
-            returnContent = "其他消息类型";
-        }
-
-
-        Map<String, Object> msgData = new HashMap<>();
-        msgData.put("content", returnContent);
-        //此消息类型用于明确回复的消息类型
-        String returnTextXml = MsgHandleUtil.encapsulationMsg(ResponseMsgType.TEXT, openid, jsonObject, msgData);
+        log.info("封装完成的数据：" + msgData.toString());
+        String returnTextXml = MsgHandleUtil.encapsulationXMLMsg(msgData);
+        log.info("封装后的返回值数据：" + returnTextXml);
         HttpUtil.sendMsg(response, returnTextXml);
     }
 

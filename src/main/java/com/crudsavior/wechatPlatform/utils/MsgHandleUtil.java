@@ -1,8 +1,13 @@
 package com.crudsavior.wechatPlatform.utils;
 
 import cn.hutool.json.*;
+import com.crudsavior.wechatPlatform.status.EventMsgType;
+import com.crudsavior.wechatPlatform.status.RequestMsgType;
 import com.crudsavior.wechatPlatform.status.ResponseMsgType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -12,6 +17,9 @@ import java.util.Map;
  * @date 2020/12/11
  **/
 public class MsgHandleUtil {
+
+    private static final Logger log = LoggerFactory.getLogger(MsgHandleUtil.class);
+
 
     /**
      * 将xml字符串解析成JSONObject
@@ -23,17 +31,114 @@ public class MsgHandleUtil {
     }
 
     /**
+     * 封装用于返回的基础数据
+     * @param jsonObject 接收到的用户数据
+     * @return 封装后的Map数据
+     */
+    public static Map<String, Object> getMsgData (JSONObject jsonObject) {
+        //消息封装仅供测试，真实环境可以创建实例类，然后其他实体类继承基础实体类
+        Map<String, Object> msgData = new HashMap<>();
+        msgData.put("openid", jsonObject.getByPath("xml.FromUserName").toString());
+        msgData.put("fromUserName", jsonObject.getByPath("xml.ToUserName").toString());
+        msgData.put("msgType", ResponseMsgType.TEXT);
+        String returnContent;
+        String msgType = jsonObject.getByPath("xml.MsgType").toString();
+        switch (msgType) {
+            case RequestMsgType.EVENT:
+                log.info("接收事件推送");
+                String event = jsonObject.getByPath("xml.Event").toString();
+                switch (event) {
+                    case EventMsgType.SUBSCRIBE:
+                        Object eventKey = jsonObject.getByPath("xml.EventKey");
+                        if (eventKey == null) {
+                            log.info("订阅事件推送.");
+                            msgData.put("content", "订阅事件推送.");
+                        } else {
+                            log.info("用户未关注时，进行关注后的事件推送.");
+                            msgData.put("content", "用户未关注时，进行关注后的事件推送.");
+                        }
+                        break;
+                    case EventMsgType.UNSUBSCRIBE:
+                        log.info("取消订阅事件推送.");
+                        msgData.put("content", "取消订阅事件推送.");
+                        break;
+                    case EventMsgType.SCAN:
+                        log.info("用户已关注时的事件推送.");
+                        msgData.put("content", "用户已关注时的事件推送.");
+                        break;
+                    case EventMsgType.LOCATION:
+                        log.info("上报地理位置事件推送.");
+                        msgData.put("content", "上报地理位置事件推送.");
+                        break;
+                    case EventMsgType.CLICK:
+                        log.info("自定义菜单事件推送.");
+                        msgData.put("content", "自定义菜单事件推送.");
+                        break;
+                    case EventMsgType.VIEW:
+                        log.info("点击菜单跳转链接时的事件推送.");
+                        msgData.put("content", "点击菜单跳转链接时的事件推送.");
+                        break;
+                }
+                break;
+            case RequestMsgType.TEXT:
+                String content = jsonObject.getByPath("xml.Content").toString();
+                if (content.equals("1")) {
+                    returnContent = "大吉大利,今晚吃鸡.(全匹配)";
+                } else if (content.equals("2")) {
+                    returnContent = "落地成盒.(全匹配)";
+                } else if (content.contains("1")) {
+                    returnContent = "大吉大利,今晚吃鸡(半匹配).";
+                } else if (content.contains("2")) {
+                    returnContent = "落地成盒.(半匹配)";
+                } else {
+                    returnContent = "啥也没有.";
+                }
+                msgData.put("content", returnContent);
+                break;
+            case RequestMsgType.IMAGE:
+                msgData.put("msgType", ResponseMsgType.IMAGE);
+                msgData.put("media_id", jsonObject.getByPath("xml.MediaId").toString());
+                break;
+            case RequestMsgType.VOICE:
+                msgData.put("msgType", ResponseMsgType.VOICE);
+                msgData.put("media_id", jsonObject.getByPath("xml.MediaId").toString());
+                break;
+            case RequestMsgType.VIDEO:
+                msgData.put("msgType", ResponseMsgType.VIDEO);
+                msgData.put("media_id", jsonObject.getByPath("xml.MediaId").toString());
+                //下面这两个还真不能乱写
+                msgData.put("title", "测试标题");
+                msgData.put("description", "测试描述");
+                break;
+            case RequestMsgType.SHORT_VIDEO:
+                returnContent = "小视频消息";
+                msgData.put("content", returnContent);
+                break;
+            case RequestMsgType.LOCATION:
+                returnContent = "地理位置消息";
+                msgData.put("content", returnContent);
+                break;
+            case RequestMsgType.LINK:
+                returnContent = "链接消息";
+                msgData.put("content", returnContent);
+                break;
+        }
+        return msgData;
+    }
+
+    /**
      * 消息封装
-     * @param msgType 回复的消息类型
-     * @param jsonData 回复的基础数据
      * @param msgData 回复的消息内容
      * @return 封装完成的xml格式字符串消息
      */
-    public static String encapsulationMsg (String msgType, String openid, JSONObject jsonData, Map<String, Object> msgData) {
+    public static String encapsulationXMLMsg (Map<String, Object> msgData) {
+        String msgType = (String) msgData.get("msgType");
+        //接收用户
+        String openid = (String) msgData.get("openid");
         //发送用户
-        String fromUserName = jsonData.getByPath("xml.ToUserName").toString();
+        String fromUserName = (String) msgData.get("fromUserName");
         //消息创建时间
-        String createTime = jsonData.getByPath("xml.CreateTime").toString();
+        long createTime = System.currentTimeMillis();
         boolean flag = false;
         StringBuilder xmlString = new StringBuilder(
                 "<xml>" +
