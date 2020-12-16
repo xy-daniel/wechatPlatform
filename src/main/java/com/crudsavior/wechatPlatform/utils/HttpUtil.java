@@ -36,6 +36,10 @@ public class HttpUtil {
         return JSONUtil.parse(HttpRequest.post(url).body(String.valueOf(JSONUtil.parse(data))).execute().body());
     }
 
+    public static String strPost (String url, String strData) {
+        return HttpRequest.post(url).body(strData).execute().body();
+    }
+
     /**
      * 从请求体的流中解析数据
      * @param request 请求体

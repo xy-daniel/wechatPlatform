@@ -1,15 +1,12 @@
 package com.crudsavior.wechatPlatform.utils;
 
 import cn.hutool.json.JSON;
+import cn.hutool.json.JSONObject;
 import com.crudsavior.wechatPlatform.cache.TokenCache;
-import com.crudsavior.wechatPlatform.controller.IndexController;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * WxUtil
@@ -82,5 +79,77 @@ public class WxUtil {
         System.out.println("WxUtil.check 请求地址：" + url);
         System.out.println("WxUtil.check 请求参数：" + data.toString());
         return HttpUtil.postToJson(url, data);
+    }
+
+    /**
+     * 创建菜单
+     * {
+     *      "button":[
+     *      {
+     *           "type":"click",
+     *           "name":"今日歌曲",
+     *           "key":"V1001_TODAY_MUSIC"
+     *       },
+     *       {
+     *            "name":"菜单",
+     *            "sub_button":[
+     *            {
+     *                "type":"view",
+     *                "name":"搜索",
+     *                "url":"http://www.soso.com/"
+     *             },
+     *             {
+     *                  "type":"miniprogram",
+     *                  "name":"wxa",
+     *                  "url":"http://mp.weixin.qq.com",
+     *                  "appid":"wx286b93c14bbf93aa",
+     *                  "pagepath":"pages/lunar/index"
+     *              },
+     *             {
+     *                "type":"click",
+     *                "name":"赞一下我们",
+     *                "key":"V1001_GOOD"
+     *             }]
+     *        }]
+     *  }
+     * @return JSON
+     * @param jsonObject 创建按钮的json
+     */
+    public static String createMenu (AtomicReference<JSONObject> jsonObject) {
+        String url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=" + fetchToken();
+        return HttpUtil.strPost(url, jsonObject.toString());
+    }
+
+    /**
+     * 删除菜单
+     * @return 返回值
+     */
+    public static String deleteMenu () {
+        String url = "https://api.weixin.qq.com/cgi-bin/menu/delete?access_token=" + fetchToken();
+        return HttpUtil.simplestGet(url);
+    }
+
+    /**
+     * 查询菜单
+     * @return 查询值
+     */
+    public static String getMenu () {
+        String url = "https://api.weixin.qq.com/cgi-bin/get_current_selfmenu_info?access_token=" + fetchToken();
+        return HttpUtil.simplestGet(url);
+    }
+
+    public static String createConditionMenu (AtomicReference<JSONObject> jsonObject) {
+        String url = "https://api.weixin.qq.com/cgi-bin/menu/addconditional?access_token=" + fetchToken();
+        return HttpUtil.strPost(url, jsonObject.toString());
+    }
+
+    public static String deleteConditionMenu(String menuidJson) {
+        String url = "https://api.weixin.qq.com/cgi-bin/menu/delconditional?access_token=" + fetchToken();
+        return HttpUtil.strPost(url, menuidJson);
+    }
+
+    public static String trymatch(String useridJson) {
+        String url = "https://api.weixin.qq.com/cgi-bin/menu/trymatch?access_token=" + fetchToken();
+        return HttpUtil.strPost(url, useridJson);
     }
 }
