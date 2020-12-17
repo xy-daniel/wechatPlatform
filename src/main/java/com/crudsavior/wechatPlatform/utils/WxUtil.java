@@ -16,7 +16,6 @@ import java.util.concurrent.atomic.AtomicReference;
  **/
 public class WxUtil {
 
-    public static String BASE_URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&";
 
     /**
      * 微信服务器校验
@@ -39,7 +38,23 @@ public class WxUtil {
      * @return success:{"access_token":"ACCESS_TOKEN","expires_in":7200},fail:{"errcode":40013,"errmsg":"invalid appid"}
      */
     public static String getToken (String appID, String appsecret) {
-        String url = BASE_URL + "appid="+ appID +"&secret="+ appsecret;
+        String url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="+ appID +"&secret="+ appsecret;
+        return HttpUtil.simplestGet(url);
+    }
+
+    /**
+     * 根据token获取全局唯一ticket
+     * {
+     *   "errcode":0,
+     *   "errmsg":"ok",
+     *   "ticket":"bxLdikRXVbTPdHSM05e5u5sUoXNKd8-41ZO3MhKoyN5OfkWITDGgnr2fwJ0m9E8NYzWKVZvdVtaUgWvsdshFKA",
+     *   "expires_in":7200
+     * }
+     * @param token token
+     * @return ticket
+     */
+    public static String geTicket (String token) {
+        String url = "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token="+ token +"&type=jsapi";
         return HttpUtil.simplestGet(url);
     }
 
@@ -49,6 +64,14 @@ public class WxUtil {
      */
     public static String fetchToken () {
         return TokenCache.tokenMap.get("token").toString();
+    }
+
+    /**
+     * 直接从全局变量中获取可以使用的ticket
+     * @return ticket
+     */
+    public static String fetchTicket () {
+        return TokenCache.tokenMap.get("ticket").toString();
     }
 
     /**

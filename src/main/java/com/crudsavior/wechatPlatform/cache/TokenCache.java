@@ -68,8 +68,11 @@ public class TokenCache {
         log.info("开始获取微信全局变量token");
         String tokenJsonStr = WxUtil.getToken(appID, appsecret);
         JSON json = JSONUtil.parse(tokenJsonStr);
-        tokenMap.put("token", json.getByPath("access_token").toString());
-        //真正的过期时间
+        String token = json.getByPath("access_token").toString();
+        tokenMap.put("token", token);
+        String ticketJsonStr = WxUtil.geTicket(token);
+        JSON ticketJson = JSONUtil.parse(ticketJsonStr);
+        tokenMap.put("ticket", ticketJson.getByPath("ticket"));
         tokenMap.put("end", System.currentTimeMillis()+Integer.parseInt(json.getByPath("expires_in").toString())*1000);
         log.info("时间："+new Date()+",tokenMap："+tokenMap.toString());
     }
