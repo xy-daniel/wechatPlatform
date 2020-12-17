@@ -57,13 +57,12 @@ public class MenuController {
      */
     @PostMapping("/menu/condition")
     public String createConditionMenu () {
-        //{"menuid":435021629}
-        //{"menuid":435021631}
+        //{"menuid":435021709}山东聊城
         return menuService.createConditionMenu();
     }
 
     /**
-     * 山吹个性化菜单
+     * 删除个性化菜单
      * @return 响应值如下
      */
     @DeleteMapping("/menu/condition")
@@ -74,8 +73,15 @@ public class MenuController {
          *     "errmsg": "ok"
          * }
          */
-        return menuService.deleteConditionMenu("{\"menuid\":435021626}");
+        return menuService.deleteConditionMenu("{\"menuid\":435021629}");
     }
+
+    @GetMapping("/menu/condition")
+    public String getConditionMenu () {
+        return menuService.getConditionMenu();
+    }
+
+
 
     /**
      * 测试个性化菜单匹配结果

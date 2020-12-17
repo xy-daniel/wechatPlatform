@@ -31,4 +31,6 @@ public interface MenuService {
     RespModel deleteConditionMenu(String menuidJson);
 
     String trymatch(String useridJson);
+
+    String getConditionMenu();
 }

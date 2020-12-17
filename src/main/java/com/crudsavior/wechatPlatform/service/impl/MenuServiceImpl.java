@@ -76,4 +76,9 @@ public class MenuServiceImpl implements MenuService {
     public String trymatch(String useridJson) {
         return WxUtil.trymatch(useridJson);
     }
+
+    @Override
+    public String getConditionMenu() {
+        return WxUtil.getConditionMenu();
+    }
 }

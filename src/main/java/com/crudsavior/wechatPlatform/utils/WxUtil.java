@@ -152,4 +152,11 @@ public class WxUtil {
         String url = "https://api.weixin.qq.com/cgi-bin/menu/trymatch?access_token=" + fetchToken();
         return HttpUtil.strPost(url, useridJson);
     }
+
+    public static String getConditionMenu() {
+        String url = "https://api.weixin.qq.com/cgi-bin/menu/get?access_token=" + fetchToken();
+        System.out.println(fetchToken());
+        return HttpUtil.simplestGet(url);
+
+    }
 }
