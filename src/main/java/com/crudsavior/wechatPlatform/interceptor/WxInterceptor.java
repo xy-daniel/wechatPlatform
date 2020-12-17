@@ -26,6 +26,9 @@ public class WxInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String signature = request.getParameter("signature");
+        if (signature == null) {
+            return true;
+        }
         String timestamp = request.getParameter("timestamp");
         String nonce = request.getParameter("nonce");
         log.info("拦截到的参数：1、" + signature + " 2、" + timestamp + " 3、" + nonce + " 4、" + token);

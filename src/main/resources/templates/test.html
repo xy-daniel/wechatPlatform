@@ -1,10 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>微信对接平台Demo</title>
 </head>
 <body>
-    <h1>测试</h1>
+    <h1>测试页面，规则：</h1>
+    <div>
+        1、配置JS接口安全域名<br/>
+        2、引入js文件<br/>
+        3.通过config接口接入权限验证配置
+    </div>
+    <h5 th:text="${noncestr}"></h5>
+    <h5 th:text="${timestamp}"></h5>
+    <h5 th:text="${signStr}"></h5>
+    <script type="application/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+    <script th:inline="javascript">
+        wx.config({
+            debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+            appId: 'wx0353669357629cdd', // 必填，公众号的唯一标识
+            timestamp: [[${timestamp}]], // 必填，生成签名的时间戳
+            nonceStr: [[${noncestr}]], // 必填，生成签名的随机串
+            signature: [[${signStr}]],// 必填，签名
+            jsApiList: [
+                "onMenuShareQQ", //分享到QQ
+                "onMenuShareQZone",//分享到QQ空间
+                "startRecord",//开始录音
+                "stopRecord",//结束录音
+                "translateVoice"//语音翻译
+            ] // 必填，需要使用的JS接口列表
+        });
+        // config信息验证后会执行ready方法
+        wx.ready(function(){
+            alert("准备好了.")
+        });
+        // config信息验证失败会执行error函数
+        wx.error(function(res){
+            alert("出错了")
+        });
+    </script>
 </body>
 </html>
