@@ -9,11 +9,11 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.crudsavior</groupId>
-    <artifactId>demo</artifactId>
+    <artifactId>wechatPlatform</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>wechatPlatform</name>
-    <description>Demo project for Spring Boot</description>
+    <description>wechatPlatform project for Spring Boot</description>
 
     <properties>
         <java.version>1.8</java.version>

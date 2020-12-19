@@ -75,10 +75,6 @@ public class IndexController {
         log.info("消息数据：\n" + jsonObject);
         //此消息类型用于了解接收到的消息类型
         Map<String, Object> msgData = MsgHandleUtil.getMsgData(jsonObject);
-        if (msgData == null) {
-            log.info("封装返回值基础数据失败.");
-            return;
-        }
         log.info("封装完成的数据：" + msgData.toString());
         String returnTextXml = MsgHandleUtil.encapsulationXMLMsg(msgData);
         log.info("封装后的返回值数据：" + returnTextXml);
