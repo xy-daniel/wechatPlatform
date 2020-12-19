@@ -1,5 +1,6 @@
 package com.crudsavior.wechatPlatform.controller;
 
+import com.crudsavior.wechatPlatform.utils.SignUtils;
 import com.crudsavior.wechatPlatform.utils.WxUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,22 +20,11 @@ import java.util.UUID;
 @Controller
 public class TestController {
 
-    @Value("${com.crudsavior.url}")
-    private String URL;
-
     @GetMapping("/admin/test")
     public String test(Model model) {
-        String ticket = WxUtil.fetchTicket();
         String timestamp = String.valueOf(System.currentTimeMillis());
         String noncestr = UUID.randomUUID().toString();
-        String[] paramsArr = {
-                "jsapi_ticket=" + ticket,
-                "noncestr=" + noncestr,
-                "timestamp" + timestamp,
-                "url=" + URL + "/admin/test"
-        };
-        Arrays.sort(paramsArr);
-        String signStr = StringUtils.join(paramsArr, "&");
+        String signStr = SignUtils.fetchSign(timestamp, noncestr, "/admin/test");
         model.addAttribute("timestamp", timestamp);
         model.addAttribute("noncestr", noncestr);
         model.addAttribute("signStr", signStr);
