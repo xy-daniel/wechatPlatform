@@ -1,14 +1,10 @@
 package com.crudsavior.wechatPlatform.controller;
 
 import com.crudsavior.wechatPlatform.utils.SignUtils;
-import com.crudsavior.wechatPlatform.utils.WxUtil;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import java.util.Arrays;
 import java.util.UUID;
 
 /**
