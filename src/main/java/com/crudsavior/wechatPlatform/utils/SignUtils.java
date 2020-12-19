@@ -1,14 +1,11 @@
 package com.crudsavior.wechatPlatform.utils;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Arrays;
 
 public class SignUtils {
-
-    @Value("${com.crudsavior.url}")
-    private static String URL;
 
     /**
      * 生成签名
@@ -19,14 +16,13 @@ public class SignUtils {
      */
     public static String fetchSign (String timestamp, String noncestr, String url) {
         String ticket = WxUtil.fetchTicket();
-
         String[] paramsArr = {
                 "jsapi_ticket=" + ticket,
                 "noncestr=" + noncestr,
-                "timestamp" + timestamp,
-                "url=" + URL + url
+                "timestamp=" + timestamp,
+                "url=" + url
         };
         Arrays.sort(paramsArr);
-        return StringUtils.join(paramsArr, "&");
+        return DigestUtils.shaHex(StringUtils.join(paramsArr, "&"));
     }
 }

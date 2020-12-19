@@ -5,17 +5,21 @@
     <title>微信对接平台Demo</title>
 </head>
 <body>
-    <h1>测试页面，规则：</h1>
     <div>
-        1、配置JS接口安全域名<br/>
-        2、引入js文件<br/>
-        3.通过config接口接入权限验证配置
+        <p>测试页面，规则：</p>
+        <ol>
+            <li>配置JS接口安全域名</li>
+            <li>引入js文件</li>
+            <li>通过config接口接入权限验证配置</li>
+        </ol>
     </div>
-    <h5 th:text="${noncestr}"></h5>
-    <h5 th:text="${timestamp}"></h5>
-    <h5 th:text="${signStr}"></h5>
+    <p th:text="${noncestr}"></p>
+    <p th:text="${timestamp}"></p>
+    <p th:text="${signStr}"></p>
     <script type="application/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+    <script type="application/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script th:inline="javascript">
+        let isCheckSuccess = true;
         wx.config({
             debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
             appId: 'wx0353669357629cdd', // 必填，公众号的唯一标识
@@ -30,14 +34,37 @@
                 "translateVoice"//语音翻译
             ] // 必填，需要使用的JS接口列表
         });
-        // config信息验证后会执行ready方法
-        wx.ready(function(){
-            alert("准备好了.")
-        });
-        // config信息验证失败会执行error函数
-        wx.error(function(res){
-            alert("出错了")
-        });
+        console.log("开始执行error回调函数.")
+        wx.error(function (){
+            console.log("Js-SDK验证失败.");
+            isCheckSuccess = false
+        })
+        console.log("ready回调函数不可信,即使js-SDK验证失败后仍然可以进入,因此我们使用全局变量来验证是否验证成功.")
+        if (isCheckSuccess === true) {
+            console.log("微信SDK验证成功.")
+            wx.ready(function(){
+                // success：接口调用成功时执行的回调函数。
+                // fail：接口调用失败时执行的回调函数。
+                // complete：接口调用完成时执行的回调函数，无论成功或失败都会执行。
+                // cancel：用户点击取消时的回调函数，仅部分有用户取消操作的api才会用到。
+                // trigger: 监听Menu中的按钮点击时触发的方法，该方法仅支持Menu中的相关接口。
+                wx.checkJsApi({
+                    jsApiList: [
+                        "onMenuShareQQ",
+                        "onMenuShareQZone",
+                        "startRecord",
+                        "stopRecord",
+                        "translateVoice"
+                    ],
+                    success: function(res) {
+                        // 以键值对的形式返回，可用的api值true，不可用为false
+                        // 如：{"checkResult":{"chooseImage":true},"errMsg":"checkJsApi:ok"}
+                        console.log(res.errMsg);
+                        console.log(res.checkResult);
+                    }
+                });
+            });
+        }
     </script>
 </body>
 </html>
